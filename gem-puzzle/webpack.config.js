@@ -15,7 +15,7 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   mode: 'development',
   entry: {
-    main: ['@babel/polyfill', './js/main.js'],
+    main: ['@babel/polyfill', './js/app.js'],
   },
   output: {
     filename: filename('js'),
