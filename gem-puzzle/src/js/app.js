@@ -1,16 +1,15 @@
 import '../styles/main.scss';
-// import image from '../assets/images/tonyem.jpg';
 import Puzzle from './models/Puzzle';
+import image from '../assets/images/31.jpg';
 
-const puzzle = new Puzzle('Webpack 5 Javascript by TonYem');
-// const cells = new Cells();
-console.log(puzzle);
-// const body = document.querySelector('body');
-// const mainImage = document.createElement('img');
-// const p = document.createElement('p');
-// const welcomeText = 'Hello world!';
-// mainImage.src = image;
+const body = document.querySelector('body');
 
-// p.textContent = welcomeText;
-// body.append(p);
-// body.append(mainImage);
+const puzzleWrapper = document.createElement('div');
+puzzleWrapper.classList.add('puzzle-wrapper');
+body.append(puzzleWrapper); // create game-board wrapper
+
+const puzzle = new Puzzle(
+  document.querySelector('.puzzle-wrapper'),
+  image,
+  480,
+);

@@ -16,6 +16,8 @@
 
 body {
   background: linear-gradient(90deg, #576068 0%, #214042 100%);
+  background-size: cover;
+  // background-repeat: no-repeat;
 }
 
 h1 {
@@ -26,4 +28,68 @@ p {
   color: #fff;
   font-size: 12rem;
   font-weight: 500;
+}
+
+.puzzle-wrapper {
+  filter: drop-shadow(0px 4px 149px rgba(131, 180, 191, 0.61));
+  height: 48rem;
+  width: 48rem;
+  margin: 18rem auto;
+  position: relative;
+
+  &:before {
+    content: '';
+    width: 58rem;
+    height: 58rem;
+    background-color: #fff;
+    box-shadow: inset 0px 0px 60px rgba(0, 0, 0, 0.25);
+    border-radius: 60px;
+    position: absolute;
+    border-radius: 6rem;
+    top: -5rem;
+    left: -5rem;
+    z-index: -10;
+  }
+  &:after {
+    content: '';
+    width: 48rem;
+    height: 48rem;
+    background: #8f8f8f;
+    position: absolute;
+    border-radius: 2rem;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25),
+      inset 0px 0px 10px rgba(0, 0, 0, 0.2);
+    filter: blur(1px);
+    top: 0;
+    left: 0;
+    z-index: -9;
+  }
+}
+
+.cell {
+  border: 1px solid #8f8f8f;
+  position: absolute;
+  background: radial-gradient(
+      50% 50% at 50% 50%,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    #ffffff;
+  filter: blur(1px);
+  border-radius: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  font-size: 3.5rem;
+  color: #8f8f8f;
+  -webkit-text-stroke: .1rem #8f8f8f;
+  text-shadow: 0px 0px rgb(0, 0, 0), -1px -1px #444;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
