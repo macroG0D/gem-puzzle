@@ -1,12 +1,13 @@
 import Cell from './Cell';
 
 export default class Puzzle {
-  constructor(el, imageSrc, width) {
+  constructor(el, dimmension, imageSrc, width) {
     this.parentEl = el;
-    this.dimmension = 4;
+    this.dimmension = dimmension;
     this.imageSrc = imageSrc;
     this.width = width;
     this.cells = [];
+    this.moves = 0;
 
     this.el = this.createWrapper();
     this.init();
@@ -18,7 +19,7 @@ export default class Puzzle {
       this.el.style.width = `${this.width}px`;
       this.el.style.height = `${this.height}px`;
 
-      this.setup();
+      this.setup(this.showImages, this.showNumbers);
     };
     img.src = this.imageSrc;
   }
@@ -33,9 +34,9 @@ export default class Puzzle {
     return div;
   }
 
-  setup() {
-    for (let i = 0; i < this.dimmension * this.dimmension - 1; i += 1) {
-      this.cells.push(new Cell(this, i));
+  setup(showImages, showNumbers) {
+    for (let i = 0; i < this.dimmension * this.dimmension; i += 1) {
+      this.cells.push(new Cell(this, i, showImages, showNumbers));
     }
     this.shuffle();
     console.log(this.cells);
@@ -44,9 +45,21 @@ export default class Puzzle {
   shuffle() {
     for (let i = this.cells.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
-      [this.cells[i], this.cells[j]] = [this.cells[j], this.cells[i]];
-      this.cells[i].setPosition(i);
-      this.cells[j].setPosition(j);
+      this.swapCells(i, j);
     }
+  }
+
+  swapCells(i, j) {
+    [this.cells[i], this.cells[j]] = [this.cells[j], this.cells[i]];
+    this.cells[i].setPosition(i);
+    this.cells[j].setPosition(j);
+  }
+
+  findPosition(ind) {
+    return this.cells.findIndex((cell) => cell.index === ind);
+  }
+
+  findEmpty() {
+    return this.cells.findIndex((cell) => cell.isEmpty);
   }
 }
