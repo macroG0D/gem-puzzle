@@ -7,7 +7,7 @@ function getRandomImage() { // generate rundom image number in range of 1 to 150
   const min = Math.ceil(1);
   const max = Math.floor(150);
   const randomImage = Math.floor(Math.random() * (max - min + 1)) + min;
-  return `../assets/images/${randomImage}.jpg`;
+  return `assets/images/${randomImage}.jpg`;
 }
 
 const puzzleWrapper = document.createElement('div');
