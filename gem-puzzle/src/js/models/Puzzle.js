@@ -13,7 +13,6 @@ export default class Puzzle {
     this.init();
     const img = new Image();
     img.onload = () => {
-      console.log(img.width, img.height);
       const temp = this.width / img.width;
       this.height = img.height * temp;
       this.el.style.width = `${this.width}px`;
@@ -39,7 +38,6 @@ export default class Puzzle {
       this.cells.push(new Cell(this, i, showImages, showNumbers));
     }
     this.shuffle();
-    console.log(this.cells);
   }
 
   shuffle() {
@@ -49,10 +47,24 @@ export default class Puzzle {
     }
   }
 
-  swapCells(i, j) {
+  swapCells(i, j, animate) {
+    this.cells[i].setPosition(j, animate, i);
+    this.cells[j].setPosition(i);
     [this.cells[i], this.cells[j]] = [this.cells[j], this.cells[i]];
-    this.cells[i].setPosition(i);
-    this.cells[j].setPosition(j);
+
+    if (this.isAssembled()) {
+      console.log('Win!');
+      console.log('total moves: ', this.moves);
+    }
+  }
+
+  isAssembled() {
+    for (let i = 0; i < this.cells.length; i += 1) {
+      if (i !== this.cells[i].index) {
+        return false;
+      }
+    }
+    return true;
   }
 
   findPosition(ind) {

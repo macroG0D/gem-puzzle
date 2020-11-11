@@ -34,8 +34,7 @@ export default class Cell {
       if ((x === emptyX || y === emptyY)
       && (Math.abs(x - emptyX) === 1 || Math.abs(y - emptyY) === 1)) {
         this.puzzle.moves += 1;
-        console.log('moves: ', this.puzzle.moves);
-        this.puzzle.swapCells(currentCellIndex, emptyCellIndex);
+        this.puzzle.swapCells(currentCellIndex, emptyCellIndex, true);
       }
     };
 
@@ -57,11 +56,42 @@ export default class Cell {
     this.el.classList.add('cell__existing');
   }
 
-  setPosition(index) {
-    const { left, top } = this.getPositionFromIndex(index);
+  setPosition(destinationIndex, animate, currentIndex) {
+    const { left, top } = this.getPositionFromIndex(destinationIndex);
+    const { left: currentLeft, top: currentTop } = this.getPositionFromIndex(currentIndex);
 
-    this.el.style.left = `${left}px`;
-    this.el.style.top = `${top}px`;
+    if (animate) {
+      if (left !== currentLeft) {
+        this.animate('left', currentLeft, left);
+      } else if (top !== currentTop) {
+        this.animate('top', currentTop, top);
+      }
+    } else {
+      this.el.style.left = `${left}px`;
+      this.el.style.top = `${top}px`;
+    }
+  }
+
+  animate(position, currentPos, destination) {
+    let currentPosition = currentPos;
+    const animateDuration = 250;
+    const frameRate = 5;
+    let step = frameRate * Math.abs((destination - currentPosition));
+    step /= animateDuration;
+
+    const id = setInterval(() => {
+      if (currentPosition < destination) {
+        currentPosition = Math.min(destination, currentPosition + step);
+        if (currentPosition >= destination) {
+          clearInterval(id);
+        }
+      } else {
+        currentPosition = Math.max(destination, currentPosition - step);
+        if (currentPosition <= destination) {
+          clearInterval(id);
+        }
+      } this.el.style[position] = `${currentPosition}px`;
+    }, frameRate);
   }
 
   getPositionFromIndex(index) {
