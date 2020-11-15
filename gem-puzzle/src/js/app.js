@@ -1,27 +1,60 @@
 import '../styles/main.scss';
-import Puzzle from './models/Puzzle';
+import * as Menu from './models/Menu';
 
 const body = document.querySelector('body');
 
-function getRandomImage() { // generate rundom image number in range of 1 to 150
-  const min = Math.ceil(1);
-  const max = Math.floor(150);
-  const randomImage = Math.floor(Math.random() * (max - min + 1)) + min;
-  return `assets/images/${randomImage}.jpg`;
+const header = document.createElement('div');
+header.classList.add('header');
+const timer = document.createElement('div');
+timer.classList.add('timer');
+
+const movesCounter = document.createElement('div');
+movesCounter.classList.add('movesCounter');
+const burgerWrapper = document.createElement('div');
+burgerWrapper.classList.add('burger-wrapper');
+
+body.append(header);
+header.append(timer);
+header.append(movesCounter);
+header.append(burgerWrapper);
+
+function createSpan() {
+  return document.createElement('span');
 }
+
+const timerTitle = createSpan();
+timerTitle.classList.add('title');
+const timerCounter = createSpan();
+timerCounter.classList.add('counter');
+
+timer.appendChild(timerTitle);
+timer.appendChild(timerCounter);
+timer.firstChild.textContent = 'Time:';
+timer.children[1].textContent = '00:00:00';
+
+const movesCounterTitle = createSpan();
+movesCounterTitle.classList.add('title');
+const movesCounterCounter = createSpan();
+movesCounterCounter.classList.add('counter');
+
+movesCounter.appendChild(movesCounterTitle);
+movesCounter.appendChild(movesCounterCounter);
+movesCounter.firstChild.textContent = 'moves:';
+movesCounter.children[1].textContent = 0;
+
+const burger = document.createElement('div');
+burger.classList.add('burger');
+burgerWrapper.appendChild(burger);
 
 const puzzleWrapper = document.createElement('div');
 puzzleWrapper.classList.add('puzzle-wrapper');
 body.append(puzzleWrapper); // create game-board wrapper
 
-const puzzle = new Puzzle(
-  document.querySelector('.puzzle-wrapper'),
-  4,
-  getRandomImage(), // pass random image url
-  480,
-);
+const burgerBtn = document.querySelector('.burger-wrapper');
 
-// puzzle settings
-puzzle.showImages = true;
-puzzle.showNumbers = true;
-puzzle.dimmension = 3;
+const menu = document.querySelector('.menu');
+burgerBtn.addEventListener('click', () => {
+  menu.classList.remove('hidden');
+  Menu.stopwatch.pauseTimer();
+  Menu.showHideResumeBtn();
+});

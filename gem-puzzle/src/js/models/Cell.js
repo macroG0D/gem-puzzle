@@ -31,9 +31,30 @@ export default class Cell {
       const { x, y } = this.getXY(currentCellIndex);
       const { x: emptyX, y: emptyY } = this.getXY(emptyCellIndex);
 
+      const possibleCells = [];
+      // check if top vertical cell is exist
+
+      // check if top vertical cell is exist
+      // if (emptyCellIndex + this.puzzle.dimmension <= this.puzzle.cells.length - 1) {
+      //   possibleCells.push(this.puzzle.cells[emptyCellIndex + this.puzzle.dimmension]);
+      // }
+
+      // if (emptyCellIndex - this.puzzle.dimmension >= 0) {
+      //   possibleCells.push(this.puzzle.cells[emptyCellIndex - this.puzzle.dimmension]);
+      // }
+
+      // console.log(this.puzzle.cells);
+      // console.log(currentCellIndex);
+      // console.log(possibleCells.includes(currentCellIndex));
+      if (possibleCells.includes(currentCellIndex)) {
+        this.puzzle.swapCells(currentCellIndex, emptyCellIndex, true);
+      }
+      // console.log(possibleCells);
       if ((x === emptyX || y === emptyY)
       && (Math.abs(x - emptyX) === 1 || Math.abs(y - emptyY) === 1)) {
         this.puzzle.moves += 1;
+        const movesCounter = document.querySelector('.movesCounter');
+        movesCounter.children[1].textContent = this.puzzle.moves;
         this.puzzle.swapCells(currentCellIndex, emptyCellIndex, true);
       }
     };
@@ -56,42 +77,11 @@ export default class Cell {
     this.el.classList.add('cell__existing');
   }
 
-  setPosition(destinationIndex, animate, currentIndex) {
-    const { left, top } = this.getPositionFromIndex(destinationIndex);
-    const { left: currentLeft, top: currentTop } = this.getPositionFromIndex(currentIndex);
+  setPosition(index) {
+    const { left, top } = this.getPositionFromIndex(index);
 
-    if (animate) {
-      if (left !== currentLeft) {
-        this.animate('left', currentLeft, left);
-      } else if (top !== currentTop) {
-        this.animate('top', currentTop, top);
-      }
-    } else {
-      this.el.style.left = `${left}px`;
-      this.el.style.top = `${top}px`;
-    }
-  }
-
-  animate(position, currentPos, destination) {
-    let currentPosition = currentPos;
-    const animateDuration = 250;
-    const frameRate = 5;
-    let step = frameRate * Math.abs((destination - currentPosition));
-    step /= animateDuration;
-
-    const id = setInterval(() => {
-      if (currentPosition < destination) {
-        currentPosition = Math.min(destination, currentPosition + step);
-        if (currentPosition >= destination) {
-          clearInterval(id);
-        }
-      } else {
-        currentPosition = Math.max(destination, currentPosition - step);
-        if (currentPosition <= destination) {
-          clearInterval(id);
-        }
-      } this.el.style[position] = `${currentPosition}px`;
-    }, frameRate);
+    this.el.style.left = `${left}px`;
+    this.el.style.top = `${top}px`;
   }
 
   getPositionFromIndex(index) {
