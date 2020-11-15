@@ -8,6 +8,8 @@ export default class Cell {
     this.width = this.puzzle.width / this.puzzle.dimmension;
     this.height = this.puzzle.height / this.puzzle.dimmension;
     this.el = this.createDiv();
+    this.moveSound = new Audio('../assets/sounds/puzzle_move.mp3');
+    this.moveSound.volume = 0.8;
 
     puzzle.el.appendChild(this.el);
     if (this.index === this.puzzle.dimmension * this.puzzle.dimmension - 1) {
@@ -31,31 +33,15 @@ export default class Cell {
       const { x, y } = this.getXY(currentCellIndex);
       const { x: emptyX, y: emptyY } = this.getXY(emptyCellIndex);
 
-      const possibleCells = [];
-      // check if top vertical cell is exist
-
-      // check if top vertical cell is exist
-      // if (emptyCellIndex + this.puzzle.dimmension <= this.puzzle.cells.length - 1) {
-      //   possibleCells.push(this.puzzle.cells[emptyCellIndex + this.puzzle.dimmension]);
-      // }
-
-      // if (emptyCellIndex - this.puzzle.dimmension >= 0) {
-      //   possibleCells.push(this.puzzle.cells[emptyCellIndex - this.puzzle.dimmension]);
-      // }
-
-      // console.log(this.puzzle.cells);
-      // console.log(currentCellIndex);
-      // console.log(possibleCells.includes(currentCellIndex));
-      if (possibleCells.includes(currentCellIndex)) {
-        this.puzzle.swapCells(currentCellIndex, emptyCellIndex, true);
-      }
-      // console.log(possibleCells);
       if ((x === emptyX || y === emptyY)
       && (Math.abs(x - emptyX) === 1 || Math.abs(y - emptyY) === 1)) {
+        if (this.puzzle.sound) {
+          this.moveSound.play();
+        }
         this.puzzle.moves += 1;
         const movesCounter = document.querySelector('.movesCounter');
         movesCounter.children[1].textContent = this.puzzle.moves;
-        this.puzzle.swapCells(currentCellIndex, emptyCellIndex, true);
+        this.puzzle.swapCells(currentCellIndex, emptyCellIndex);
       }
     };
 
@@ -79,7 +65,6 @@ export default class Cell {
 
   setPosition(index) {
     const { left, top } = this.getPositionFromIndex(index);
-
     this.el.style.left = `${left}px`;
     this.el.style.top = `${top}px`;
   }

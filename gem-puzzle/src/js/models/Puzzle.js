@@ -1,8 +1,8 @@
 import Cell from './Cell';
 
-const newScore = [];
+const lastWinResult = [];
 export default class Puzzle {
-  constructor(el, dimmension, imageSrc, width) {
+  constructor(el, dimmension, imageSrc, width, sound) {
     this.parentEl = el;
     this.dimmension = dimmension;
     this.imageSrc = imageSrc;
@@ -10,8 +10,14 @@ export default class Puzzle {
     this.cells = [];
     this.moves = 0;
     this.canResume = false;
+    this.sound = sound;
+    this.winSound = new Audio('../assets/sounds/puzzel_winner.mp3');
+    this.winSound.volume = 0.5;
+    this.shuffled = false;
 
-    this.x = 0;
+    this.shufflesCount = 0;
+    this.y = 0;
+
     this.lastShuffled = 0;
 
     this.el = this.createWrapper();
@@ -38,67 +44,66 @@ export default class Puzzle {
     return div;
   }
 
-  // setup(showImages, showNumbers) { // рабочий вариант
-  //   for (let i = 0; i < this.dimmension * this.dimmension; i += 1) {
-  //     this.cells.push(new Cell(this, i, showImages, showNumbers));
-  //   }
-  //   this.shuffle();
-  // }
-
   setup(showImages, showNumbers) {
     for (let i = 0; i < this.dimmension * this.dimmension; i += 1) {
       this.cells.push(new Cell(this, i, showImages, showNumbers));
       this.cells[i].setPosition(i);
     }
-    this.shuffle();
 
     // this.shuffleInterval = setInterval(() => {
-    //   const y = this.newShuffle();
-    //   this.swapCells(y.emptyCellIndex, y.randPossibleCell);
-    // }, 1200);
-  }
-
-  newShuffle() {
-    this.x += 1;
-    if (this.x >= 10) {
-      clearInterval(this.shuffleInterval);
+    //   const y = this.shuffle();
+    //   this.shuffle();
+    // }, 300);
+    while (this.shufflesCount < 1500) {
+      this.shuffle();
     }
-
-    const emptyCellIndex = this.findEmpty();
-    const boardSize = this.cells.length;
-    const possibleCells = [];
-    let randPossibleCellIndex = 0;
-    let randPossibleCell = '';
-    // check if top vertical cell is exist
-    if (emptyCellIndex + this.dimmension <= boardSize - 1) {
-      possibleCells.push(this.cells[emptyCellIndex + this.dimmension]);
-    }
-    // check if bottom vertical cell is exist
-    if (emptyCellIndex - this.dimmension >= 0) {
-      possibleCells.push(this.cells[emptyCellIndex - this.dimmension]);
-    }
-    // check if empty cell is fist in a row
-    if (emptyCellIndex % this.dimmension !== 0) {
-      possibleCells.push(this.cells[emptyCellIndex - 1]);
-    }
-    // check if empty cell is last in a arow
-    if (emptyCellIndex % this.dimmension !== this.dimmension - 1) {
-      possibleCells.push(this.cells[emptyCellIndex + 1]);
-    }
-
-    randPossibleCellIndex = Math.floor(
-      Math.random() * Math.floor(possibleCells.length),
-    );
-    console.log('cells length: ', possibleCells.length);
-    randPossibleCell = possibleCells[randPossibleCellIndex].index;
-    return { emptyCellIndex, randPossibleCell };
+    this.shuffled = true;
   }
 
   shuffle() {
-    for (let i = this.cells.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      this.swapCells(i, j);
+    this.shufflesCount += 1;
+    // if (this.x >= 1000) {
+    //   clearInterval(this.shuffleInterval);
+    // }
+    const emptyCellIndex = this.findEmpty();
+    const currentCellIndex = Math.floor(Math.random() * this.dimmension * this.dimmension);
+    const { x, y } = this.getXY(currentCellIndex);
+    const { x: emptyX, y: emptyY } = this.getXY(emptyCellIndex);
+    if ((x === emptyX || y === emptyY)
+    && (Math.abs(x - emptyX) === 1 || Math.abs(y - emptyY) === 1)) {
+      this.swapCells(currentCellIndex, emptyCellIndex);
+      if (this.isAssembled()) { // if shuffed to assembled — reshuffle
+        this.shuffle();
+      }
     }
+  }
+
+  solveGame() {
+    // if (this.x >= 1000) {
+    //   clearInterval(this.shuffleInterval);
+    // }
+    this.y += 1;
+    const emptyCellIndex = this.findEmpty();
+    const currentCellIndex = Math.floor(Math.random() * this.dimmension * this.dimmension);
+    const { x, y } = this.getXY(currentCellIndex);
+    const { x: emptyX, y: emptyY } = this.getXY(emptyCellIndex);
+    if ((x === emptyX || y === emptyY)
+    && (Math.abs(x - emptyX) === 1 || Math.abs(y - emptyY) === 1)) {
+      this.swapCells(currentCellIndex, emptyCellIndex);
+      if (this.isAssembled()) { // if shuffed to assembled — reshuffle
+        return;
+      }
+    }
+    while (!this.isAssembled()) {
+      this.solveGame();
+    }
+  }
+
+  getXY(index) {
+    return {
+      x: index % this.dimmension,
+      y: Math.floor(index / this.dimmension),
+    };
   }
 
   swapCells(i, j) {
@@ -106,11 +111,10 @@ export default class Puzzle {
     this.cells[j].setPosition(i);
     [this.cells[i], this.cells[j]] = [this.cells[j], this.cells[i]];
 
-    if (this.isAssembled()) {
+    if (this.isAssembled() && this.shuffled) { // check if already shuffled to prevent 0 moves win
       this.win();
+      this.shuffled = false;
     }
-
-    // console.log('total time: ', Menu.stopwatch.totalTime);
   }
 
   isAssembled() {
@@ -135,6 +139,9 @@ export default class Puzzle {
   }
 
   win() {
+    if (this.sound) {
+      this.winSound.play();
+    }
     const timer = document.querySelector('.timer');
     const timerDisplay = timer.children[1];
     const totalTime = timerDisplay.textContent;
@@ -145,11 +152,11 @@ export default class Puzzle {
     const totalTimeResult = document.querySelector('.totalTimeResult');
     totalTimeResult.textContent = `Time: ${totalTime}`;
     const boardSize = document.querySelector('.boardSize');
-    boardSize.textContent = `Size: ${this.dimmension}x${this.dimmension}`;
-    newScore.splice(0, newScore.length); // if array
-    newScore.push(this.moves);
-    newScore.push(totalTime);
-    newScore.push(this.dimmension);
-    localStorage.setItem('newScore', newScore);
+    boardSize.textContent = `Size: ${this.dimmension} x ${this.dimmension}`;
+    lastWinResult.splice(0, lastWinResult.length); // if array
+    lastWinResult.push(this.moves);
+    lastWinResult.push(totalTime);
+    lastWinResult.push(this.dimmension);
+    localStorage.setItem('lastWinResult', lastWinResult);
   }
 }

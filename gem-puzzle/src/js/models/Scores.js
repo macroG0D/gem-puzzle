@@ -1,59 +1,96 @@
 export default class Scores {
-  constructor() {
-    this.latestScore = [];
-    this.topScores = [];
+  getLastWinScore() {
+    let lastWinScore = localStorage.getItem('lastWinResult');
+    lastWinScore = lastWinScore.split(',');
+    const moves = lastWinScore[0]; // total moves
+    const timer = lastWinScore[1]; // total time
+    const boardSize = lastWinScore[2]; // finished game board size
+
+    const oneResult = [];
+    oneResult.push(moves);
+    oneResult.push(boardSize);
+    oneResult.push(timer);
+    oneResult.push(this.getTotalSecs(timer)); // total seconds
+
+    // Здесь должен быть вызов метода в который я передам oneResult и в том методе будет проходить
+    // сортировка топ 5 результатов. Также после того как метод будет вызван,
+
+    this.topResults(oneResult);
+    // нужно удалить localStorage.getItem('lastWinResult');
   }
 
-  addScore() {
-    this.latestScore = localStorage.getItem('newScore'); // get latest score from LS to sort it
+  topResults(oneResult) {
+    let topResults = this.getAllResults();
+    const weakestTop = topResults[topResults.length - 1] || oneResult;
 
-    let tempArr = [];
-    const realscore = this.latestScore.split(',');
-
-    const scoreMoves = realscore[0];
-    const time = realscore[1].split(':');
-    const scoreSize = realscore[2];
-
-    const hours = time[0];
-    const minutes = time[1];
-    const seconds = time[2];
-    const totalSecs = seconds * 1 + minutes * 60 + hours * 3600;
-
-    const totaltime = time.join(':');
-    tempArr = [];
-    tempArr.push(totalSecs); // speed for sorting
-    tempArr.push(totaltime);
-    tempArr.push(scoreMoves);
-    tempArr.push(scoreSize);
-
-    if (this.topScores.length >= 5) {
-      if (tempArr[0] < this.topScores[this.topScores.length - 1][0]) {
-        this.topScores.pop(); // remove last result if score list is above 10
-        this.topScores.push(tempArr);
+    // check if need to remove last one and push new
+    if (topResults.length > 9) {
+      if ((weakestTop[1] < oneResult[1]) // if wekest's is on smaller board size
+        // or if weakest field size smaller or equals current
+        // and if the weakest's total-time is greater then current result
+        || (weakestTop[1] === oneResult[1] && weakestTop[2] > oneResult[2])
+        // or if time is the same, but weakest did more moves
+        || (weakestTop[2] === oneResult[2] && weakestTop[0] >= oneResult[0])) {
+        // then remove the weakest and push the new one
+        topResults.pop();
+        topResults.push(oneResult); // add latest top result to the end of array
       } else {
         return;
       }
     } else {
-      this.topScores.push(tempArr);
+      topResults.push(oneResult); // add latest top result to the end of array
     }
-    this.scoreSort();
 
-    this.topScores.forEach((score, index) => { // add top results to local storage
-      localStorage.setItem(index + 1, score);
+    // SORT BY PRIORITY: 1)boardSize 2)time 3)moves
+    topResults = this.sortByMoves(topResults);
+    topResults = this.sortByTime(topResults);
+    topResults = this.sortByBoardSize(topResults);
+    this.storeResults(topResults);
+  }
+
+  storeResults(topResultsArray) {
+    topResultsArray.forEach((result, index) => {
+      localStorage.setItem(index + 1, result);
     });
   }
 
-  scoreSort() {
-    this.topScores.sort((a, b) => {
-      const keyA = a[0];
-      const keyB = b[0];
-      if (keyA < keyB) return -1;
-      if (keyA > keyB) return 1;
-      return 0;
-    });
+  getTotalSecs(timer) {
+    const tempTimer = timer.split(':');
+    const hours = tempTimer[0];
+    const minutes = tempTimer[1];
+    const seconds = tempTimer[2];
+    // convert total time to seconds
+    const totalSecs = seconds * 1 + minutes * 60 + hours * 3600;
+    return totalSecs;
   }
 
-  scoreList() {
-    this.topScores.forEach((score) => score);
+  sortByTime(arr) {
+    // sort by total seconds
+    return arr.sort((x, y) => x[3] - y[3]);
+  }
+
+  sortByBoardSize(arr) {
+    // sort by total board size
+    return arr.sort((x, y) => y[1] - x[1]);
+  }
+
+  sortByMoves(arr) {
+    // sort by total moves
+    return arr.sort((x, y) => x[0] - y[0]);
+  }
+
+  getAllResults() {
+    // check if keys (1-5) exsists in localStorage and if they are — return them in theys order
+    const allResults = [];
+    const storage = localStorage;
+    for (let i = 0; i < 10; i += 1) {
+      // becouse top 5
+      if (storage[i + 1] !== undefined) {
+        // if storage has keys from 1 to 5 push them
+        const toArray = storage[i + 1].split(',');
+        allResults.push(toArray);
+      }
+    }
+    return allResults;
   }
 }

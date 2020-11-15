@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import Puzzle from './Puzzle';
 // import * as stopwatch from './stopWatch';
 import StopWatch from './stopWatch';
@@ -13,25 +12,8 @@ export default class Menu {
     this.showImages = true;
     this.showNumbers = true;
     this.fieldSize = 4;
-    this.scoresobj = new Scores(); // создаю объект Scores
     this.initMenu();
   }
-
-  // updateScores() {
-  //   const topTen = [];
-  //   const myStorage = window.localStorage;
-  //   const storedScores = Array.from(myStorage);
-  //   storedScores.forEach((topScore) => {
-  //     if (topScore !== undefined) {
-  //       topTen.push(topScore);
-  //     }
-  //   });
-  //   return topTen;
-  // }
-
-  // scores() {
-  //   this.scoresobj.addScore();
-  // }
 
   initMenu() {
     const body = document.querySelector('body');
@@ -131,7 +113,7 @@ export default class Menu {
     fieldSizes.forEach((option) => {
       sizeOption = document.createElement('option');
       sizeOption.value = option;
-      sizeOption.textContent = `${option}x${option}`;
+      sizeOption.textContent = `${option} x ${option}`;
       selectSize.appendChild(sizeOption);
     });
     selectSize.children[1].setAttribute('selected', '');
@@ -164,7 +146,7 @@ export default class Menu {
 
     const boardSize = document.createElement('div');
     boardSize.classList.add('boardSize');
-    boardSize.textContent = `Size: ${this.fieldSize}x${this.fieldSize}`;
+    boardSize.textContent = `Size: ${this.fieldSize} x ${this.fieldSize}`;
 
     winnerScreenResults.append(totalMovesResult);
     winnerScreenResults.append(totalTimeResult);
@@ -192,43 +174,11 @@ export default class Menu {
     const rankingsList = document.createElement('ol');
     rankingsList.classList.add('rankingsList');
 
-    // const scoreObject = this.updateScores();
-    // scoreObject.forEach((score, index) => {
-    //   const rating = document.createElement('span');
-    //   rating.classList.add('rating');
-    //   rating.innerText = `${index + 1})`;
-    //   const rankingsListItem = document.createElement('li');
-    //   rankingsListItem.classList.add('rankingsListItem');
-    //   rankingsListItem.innerText = score;
-    //   rankingsListItem.prepend(rating);
-    //   rankingsList.append(rankingsListItem);
-    //   console.log(score);
-    // });
-
     scoreWrapper.append(rankingsList);
     rankingsList.classList.add('rankingsList');
     body.append(scoreWrapper);
     scoreWrapper.append(scoreCloseBtn);
   }
-
-  // updateScoresTable() {
-  //   const ol = document.querySelector('.rankingsList');
-  //   const li = document.querySelectorAll('.rankingsListItem');
-  //   li.forEach((item) => {
-  //     item.remove();
-  //   });
-  //   const scoreObject = this.updateScores();
-  //   scoreObject.forEach((score, index) => {
-  //     const rating = document.createElement('span');
-  //     rating.classList.add('rating');
-  //     rating.innerText = `${index + 1})`;
-  //     const rankingsListItem = document.createElement('li');
-  //     rankingsListItem.classList.add('rankingsListItem');
-  //     rankingsListItem.innerText = score;
-  //     rankingsListItem.prepend(rating);
-  //     ol.append(rankingsListItem);
-  //   });
-  // }
 
   settingsOnOff(images = this.showImages, numbers = this.showNumbers, size = this.fieldSize) {
     const settingsWrapper = document.querySelector('.settings-wrapper');
@@ -253,7 +203,7 @@ function getRandomImage() {
 
 export const stopwatch = new StopWatch();
 let puzzle;
-function startNewGame(showImages = true, showNumbers = true, dimemension = 4) {
+function startNewGame(showImages = true, showNumbers = true, dimemension = 4, sound = true) {
   if (puzzle) {
     stopwatch.resetTimer();
     puzzle.reset();
@@ -265,6 +215,7 @@ function startNewGame(showImages = true, showNumbers = true, dimemension = 4) {
     dimemension,
     getRandomImage(), // pass random image url
     480,
+    sound,
   );
   // puzzle settings
   puzzle.showImages = showImages;
@@ -283,10 +234,16 @@ export function showHideResumeBtn() {
 
 const mnu = document.querySelector('.menu');
 document.querySelector('#newGame').addEventListener('click', () => {
-  startNewGame(menu.showImages, menu.showNumbers, menu.fieldSize);
+  startNewGame(menu.showImages, menu.showNumbers, menu.fieldSize, menu.sound);
   puzzle.canResume = true;
   mnu.classList.add('hidden');
+  const movesCounter = document.querySelector('.movesCounter');
+  movesCounter.children[1].textContent = 0; // reset moves counter on screen
+  const timer = document.querySelector('.timer');
+  timer.children[1].textContent = '00:00:00'; // reset time counter on screen
 });
+
+const scores = new Scores();
 
 const winBtn = document.querySelector('.winner');
 winBtn.addEventListener('click', () => {
@@ -298,7 +255,7 @@ winBtn.addEventListener('click', () => {
   puzzle.canResume = false;
   showHideResumeBtn();
   mnu.classList.remove('hidden');
-  // menu.scores(); // обновляю scores Scores.js
+  scores.getLastWinScore();
 });
 
 document.querySelector('#resume').addEventListener('click', () => {
@@ -309,10 +266,18 @@ document.querySelector('#resume').addEventListener('click', () => {
 document.querySelector('.sound').addEventListener('click', () => {
   const soundBtn = document.querySelector('.sound');
   if (soundBtn.classList.contains('sound_on')) {
+    menu.sound = false;
+    if (puzzle) {
+      puzzle.sound = false;
+    }
     soundBtn.classList.remove('sound_on');
     soundBtn.classList.add('sound_off');
     soundBtn.style = 'background-image: url("./assets/icons/sound_off.svg")';
   } else {
+    menu.sound = true;
+    if (puzzle) {
+      puzzle.sound = true;
+    }
     soundBtn.classList.remove('sound_off');
     soundBtn.classList.add('sound_on');
     soundBtn.style = 'background-image: url("./assets/icons/sound_on.svg")';
@@ -333,10 +298,47 @@ const scoreWindow = document.querySelector('.scoreWrapper');
 
 document.querySelector('#showScores').addEventListener('click', () => {
   scoreWindow.classList.remove('hidden');
-  // menu.updateScoresTable();
-  // menu.updateScores();
+
+  const allResults = scores.getAllResults();
+
+  // console.log('allResults: ', allResults);
+
+  const rankingsList = document.querySelector('.rankingsList');
+
+  const li = document.querySelectorAll('.rankingsListItem');
+  li.forEach((item) => { // clear previous results li to prevent duplicate
+    item.remove();
+  });
+
+  allResults.forEach((result, index) => {
+    const rating = document.createElement('span');
+    rating.classList.add('rating');
+    rating.innerText = `${index + 1}`;
+    const rankingsListItem = document.createElement('li');
+    rankingsListItem.classList.add('rankingsListItem');
+    const boardSizeSpan = document.createElement('span');
+    const timeSpan = document.createElement('span');
+    const movesSpan = document.createElement('span');
+    boardSizeSpan.classList.add('boardSizeSpan');
+    timeSpan.classList.add('timeSpan');
+    movesSpan.classList.add('movesSpan');
+
+    boardSizeSpan.innerText = `size: ${result[1]} x ${result[1]}`;
+    timeSpan.innerText = `time: ${result[2]}`;
+    movesSpan.innerText = `moves: ${result[0]}`;
+
+    rankingsListItem.append(boardSizeSpan);
+    rankingsListItem.append(timeSpan);
+    rankingsListItem.append(movesSpan);
+    rankingsListItem.prepend(rating);
+    rankingsList.append(rankingsListItem);
+  });
 });
 
 document.querySelector('.closeScore').addEventListener('click', () => {
   scoreWindow.classList.add('hidden');
+});
+
+document.querySelector('#autocomplete').addEventListener('click', () => {
+  puzzle.solveGame();
 });
