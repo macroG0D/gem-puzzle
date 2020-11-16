@@ -12,9 +12,9 @@ export default class Puzzle {
     this.moves = 0;
     this.canResume = false;
     this.sound = sound;
-    this.moveSound = new Audio('../assets/sounds/puzzle_move.mp3');
+    this.moveSound = new Audio('./assets/sounds/puzzle_move.mp3');
     this.moveSound.volume = 0.8;
-    this.winSound = new Audio('../assets/sounds/puzzel_winner.mp3');
+    this.winSound = new Audio('./assets/sounds/puzzel_winner.mp3');
     this.winSound.volume = 0.5;
     this.shuffled = false;
 
@@ -95,10 +95,8 @@ export default class Puzzle {
     const draggableCells = document.querySelectorAll('.draggable');
     draggableCells.forEach((dragablecell) => {
       dragablecell.addEventListener('dragstart', () => {
-        // console.log('start')
         dragablecell.classList.add('blured');
         setTimeout(() => (dragablecell.classList.add('hidden')), 0);
-        // dragablecell.classList.add('hidden');
         this.cells.forEach((cell, index) => {
           if (cell.el === dragablecell) {
             this.draggedCellIndex = index;
@@ -106,10 +104,8 @@ export default class Puzzle {
         });
       });
       dragablecell.addEventListener('dragend', () => {
-        // setTimeout(() => (dragablecell.classList.remove('hidden')), 0);
         dragablecell.classList.remove('hidden');
         dragablecell.classList.remove('blured');
-        console.log('end');
       });
     });
   }

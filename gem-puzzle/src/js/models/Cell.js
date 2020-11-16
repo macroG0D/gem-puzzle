@@ -8,7 +8,7 @@ export default class Cell {
     this.width = this.puzzle.width / this.puzzle.dimmension;
     this.height = this.puzzle.height / this.puzzle.dimmension;
     this.el = this.createDiv();
-    this.moveSound = new Audio('../assets/sounds/puzzle_move.mp3');
+    this.moveSound = new Audio('./assets/sounds/puzzle_move.mp3');
     this.moveSound.volume = 0.8;
 
     // eslint-disable-next-line no-unused-expressions

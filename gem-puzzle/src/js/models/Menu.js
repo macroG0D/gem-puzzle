@@ -361,9 +361,9 @@ document.querySelector('#autocomplete').addEventListener('click', () => {
 const saveBtn = document.querySelector('#saveGame');
 
 saveBtn.addEventListener('click', () => {
-  console.log('save');
-  console.log(puzzle.cells); // puzzle cells positions object
-  console.log(stopwatch);
+  // console.log('save');
+  // console.log(puzzle.cells); // puzzle cells positions object
+  // console.log(stopwatch);
   // console.log(stopwatch.getShowTime());
 });
 

@@ -11,7 +11,6 @@ export default class StopWatch {
   startTimer(startTime = new Date().getTime()) {
     if (!this.running) {
       StopWatch.startTime = startTime;
-      console.log('timeFormat: ', StopWatch.startTime);
       this.tInterval = setInterval(this.getShowTime, 1000);
       this.paused = 0;
       this.running = 1;
@@ -41,7 +40,6 @@ export default class StopWatch {
   }
 
   getShowTime() {
-    // console.log(StopWatch.savedTime);
     const timer = document.querySelector('.timer');
     const timerDisplay = timer.children[1];
     StopWatch.updatedTime = new Date().getTime();
