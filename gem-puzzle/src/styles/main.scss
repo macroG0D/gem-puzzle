@@ -6,6 +6,12 @@
 :root {
   font-size: 10px;
   font-family: 'Roboto', sans-serif;
+  @media (max-width: 1920px) {
+    font-size: 8px;
+  }
+  @media (max-width: 480px) {
+    font-size: 6.45px;
+  }
 }
 
 * {
@@ -25,8 +31,11 @@
 body {
   background: linear-gradient(90deg, #576068 0%, #214042 100%);
   background-size: cover;
-  // overflow: hidden;
-  // background-repeat: no-repeat;
+  overflow: hidden;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-repeat: no-repeat;
 }
 
 h1 {
@@ -58,6 +67,7 @@ p {
     content: '';
     width: 58rem;
     height: 58rem;
+    
     background-color: #fff;
     box-shadow: inset 0px 0px 60px rgba(0, 0, 0, 0.25);
     border-radius: 60px;
@@ -112,6 +122,10 @@ p {
       #ffffff;
     // filter: blur(1px); // low framerate when big board
   }
+}
+
+.blured {
+  filter: blur()
 }
 
 .header {
@@ -178,8 +192,8 @@ p {
   left: 0;
   position: absolute;
   width: 100vw;
-  // height: 100vh;
-  height: -webkit-fill-available;
+  height: 100vh;
+  // height: -webkit-fill-available;
   z-index: 2;
   color: #fff;
 
@@ -221,7 +235,7 @@ p {
       color: #444;
     }
   }
-  &__item:nth-child(5) {
+  &__item:nth-child(6) {
     margin-bottom: 3.5rem;
     &:after {
       content: '';
@@ -247,8 +261,8 @@ p {
   display: flex;
   justify-content: center;
   box-shadow: inset 0px 0px 30px rgba(0, 0, 0, 0.25);
-  width: 6rem;
-  height: 6rem;
+  min-width: 6rem;
+  min-height: 6rem;
   cursor: pointer;
   & img {
     display: block;
@@ -302,6 +316,9 @@ p {
   border-top: 1px solid #fff;
   border-bottom: 1px solid #fff;
   justify-content: space-between;
+  @media (max-width: 576px) {
+    width: 90%;
+  }
 }
 
 .checkbox {
@@ -339,7 +356,7 @@ label {
   align-items: center;
   margin: 6rem auto;
   width: 20rem;
-  height: 5rem;
+  min-height: 5rem;
   font-size: 2.4rem;
   font-weight: 500;
   border-radius: 1rem;
@@ -447,4 +464,18 @@ select {
       text-align: right;
     }
   }
+  @media (max-width: 576px) {
+    width: 90%;
+  }
+}
+
+ol {
+  padding: 0;
+}
+
+.content-wrapper {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  height: 100%;
 }

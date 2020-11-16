@@ -11,12 +11,7 @@ export default class Scores {
     oneResult.push(boardSize);
     oneResult.push(timer);
     oneResult.push(this.getTotalSecs(timer)); // total seconds
-
-    // Здесь должен быть вызов метода в который я передам oneResult и в том методе будет проходить
-    // сортировка топ 5 результатов. Также после того как метод будет вызван,
-
     this.topResults(oneResult);
-    // нужно удалить localStorage.getItem('lastWinResult');
   }
 
   topResults(oneResult) {

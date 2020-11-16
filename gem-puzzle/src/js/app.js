@@ -2,6 +2,8 @@ import '../styles/main.scss';
 import * as Menu from './models/Menu';
 
 const body = document.querySelector('body');
+const contentWrapper = document.createElement('div');
+contentWrapper.classList.add('content-wrapper');
 
 const header = document.createElement('div');
 header.classList.add('header');
@@ -13,7 +15,9 @@ movesCounter.classList.add('movesCounter');
 const burgerWrapper = document.createElement('div');
 burgerWrapper.classList.add('burger-wrapper');
 
-body.append(header);
+// body.append(header);
+body.append(contentWrapper);
+contentWrapper.append(header);
 header.append(timer);
 header.append(movesCounter);
 header.append(burgerWrapper);
@@ -48,8 +52,9 @@ burgerWrapper.appendChild(burger);
 
 const puzzleWrapper = document.createElement('div');
 puzzleWrapper.classList.add('puzzle-wrapper');
-body.append(puzzleWrapper); // create game-board wrapper
 
+body.append(contentWrapper); // create game-board wrapper
+contentWrapper.append(puzzleWrapper);
 const burgerBtn = document.querySelector('.burger-wrapper');
 
 const menu = document.querySelector('.menu');

@@ -11,6 +11,9 @@ export default class Cell {
     this.moveSound = new Audio('../assets/sounds/puzzle_move.mp3');
     this.moveSound.volume = 0.8;
 
+    // eslint-disable-next-line no-unused-expressions
+    this.draggedCellIndex;
+
     puzzle.el.appendChild(this.el);
     if (this.index === this.puzzle.dimmension * this.puzzle.dimmension - 1) {
       this.el.classList.add('cell__empty');
@@ -27,7 +30,9 @@ export default class Cell {
     div.style.width = `${this.width}px`;
     div.style.height = `${this.height}px`;
 
-    div.onclick = () => {
+    // drag N drop the cells
+    // click on cells
+    div.addEventListener('click', () => {
       const currentCellIndex = this.puzzle.findPosition(this.index);
       const emptyCellIndex = this.puzzle.findEmpty();
       const { x, y } = this.getXY(currentCellIndex);
@@ -43,8 +48,7 @@ export default class Cell {
         movesCounter.children[1].textContent = this.puzzle.moves;
         this.puzzle.swapCells(currentCellIndex, emptyCellIndex);
       }
-    };
-
+    });
     return div;
   }
 

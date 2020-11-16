@@ -1,15 +1,17 @@
 export default class StopWatch {
   constructor() {
     this.tInterval = 0;
-    StopWatch.savedTime = 0;
+    this.savedTime = 0;
     this.paused = 0;
     this.running = 0;
+    this.difference = 0;
     StopWatch.totalTime = 0;
   }
 
-  startTimer() {
+  startTimer(startTime = new Date().getTime()) {
     if (!this.running) {
-      StopWatch.startTime = new Date().getTime();
+      StopWatch.startTime = startTime;
+      console.log('timeFormat: ', StopWatch.startTime);
       this.tInterval = setInterval(this.getShowTime, 1000);
       this.paused = 0;
       this.running = 1;
@@ -59,5 +61,6 @@ export default class StopWatch {
     seconds = seconds < 10 ? `0${seconds}` : seconds;
     timerDisplay.innerHTML = `${hours}:${minutes}:${seconds}`;
     StopWatch.totalTime = `${hours}:${minutes}:${seconds}`;
+    return `${hours}:${minutes}:${seconds}`;
   }
 }
