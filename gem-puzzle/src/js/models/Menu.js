@@ -65,6 +65,7 @@ export default class Menu {
     if (!this.hasSavedGame) {
       loadBtn.classList.add('hidden');
     }
+    document.querySelector('#autocomplete').classList.add('hidden');
 
     // Create settings menu
     const settingsWrapper = document.createElement('div');
@@ -178,7 +179,7 @@ export default class Menu {
     const topScoresTable = document.createElement('div');
     topScoresTable.classList.add('topScores');
     const topScoresHeader = document.createElement('h2');
-    topScoresHeader.innerText = 'Top 5 results';
+    topScoresHeader.innerText = 'Top 10 results';
     scoreWrapper.append(topScoresHeader);
 
     const rankingsList = document.createElement('ol');
