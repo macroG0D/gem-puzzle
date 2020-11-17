@@ -5,8 +5,8 @@ export default class Cell {
     this.numbersOn = numbersOn; // if numbersOn true — use numbers, esle use numbers
     this.puzzle = puzzle;
     this.index = index;
-    this.width = this.puzzle.width / this.puzzle.dimmension;
-    this.height = this.puzzle.height / this.puzzle.dimmension;
+    this.width = this.puzzle.width / this.puzzle.dimension;
+    this.height = this.puzzle.height / this.puzzle.dimension;
     this.el = this.createDiv();
     this.moveSound = new Audio('./assets/sounds/puzzle_move.mp3');
     this.moveSound.volume = 0.8;
@@ -15,7 +15,7 @@ export default class Cell {
     this.draggedCellIndex;
 
     puzzle.el.appendChild(this.el);
-    if (this.index === this.puzzle.dimmension * this.puzzle.dimmension - 1) {
+    if (this.index === this.puzzle.dimension * this.puzzle.dimension - 1) {
       this.el.classList.add('cell__empty');
       this.isEmpty = true;
       return;
@@ -30,7 +30,6 @@ export default class Cell {
     div.style.width = `${this.width}px`;
     div.style.height = `${this.height}px`;
 
-    // drag N drop the cells
     // click on cells
     div.addEventListener('click', () => {
       const currentCellIndex = this.puzzle.findPosition(this.index);
@@ -83,8 +82,8 @@ export default class Cell {
 
   getXY(index) {
     return {
-      x: index % this.puzzle.dimmension,
-      y: Math.floor(index / this.puzzle.dimmension),
+      x: index % this.puzzle.dimension,
+      y: Math.floor(index / this.puzzle.dimension),
     };
   }
 }

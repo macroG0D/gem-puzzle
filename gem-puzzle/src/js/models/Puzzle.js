@@ -3,28 +3,32 @@ import Cell from './Cell';
 
 const lastWinResult = [];
 export default class Puzzle {
-  constructor(el, dimmension, imageSrc, width, sound) {
+  constructor(newGame = true, el, dimension, imageSrc, width, sound, moves = 0) {
+    this.newGame = newGame; // true if new game | false if loaded game
     this.parentEl = el;
-    this.dimmension = dimmension;
+    this.dimension = dimension;
     this.imageSrc = imageSrc;
     this.width = width;
     this.cells = [];
-    this.moves = 0;
+    this.moves = moves;
     this.canResume = false;
     this.sound = sound;
     this.moveSound = new Audio('./assets/sounds/puzzle_move.mp3');
     this.moveSound.volume = 0.8;
     this.winSound = new Audio('./assets/sounds/puzzel_winner.mp3');
     this.winSound.volume = 0.5;
-    this.shuffled = false;
 
+    this.shuffled = false;
     this.shufflesCount = 0;
-    this.y = 0;
+
+    // this.y = 0;
 
     this.lastShuffled = 0;
 
     this.el = this.createWrapper();
+
     this.init();
+
     const img = new Image();
     img.onload = () => {
       const temp = this.width / img.width;
@@ -32,7 +36,11 @@ export default class Puzzle {
       this.el.style.width = `${this.width}px`;
       this.el.style.height = `${this.height}px`;
 
-      this.setup(this.showImages, this.showNumbers);
+      if (this.newGame) {
+        this.newGameSetup(this.showImage, this.showNumbers);
+      } else {
+        this.loadedGameSetup(this.showImage, this.showNumbers, this.savedOrder);
+      }
     };
     img.src = this.imageSrc;
   }
@@ -44,18 +52,34 @@ export default class Puzzle {
 
   createWrapper() {
     const div = document.createElement('div');
+    div.classList.add('puzzle-cells');
     return div;
   }
 
-  setup(showImages, showNumbers) {
-    for (let i = 0; i < this.dimmension * this.dimmension; i += 1) {
-      this.cells.push(new Cell(this, i, showImages, showNumbers));
+  loadedGameSetup(showImage, showNumbers, savedOrder) {
+    // console.log(savedOrder);
+    for (let i = 0; i < this.dimension * this.dimension; i += 1) {
+      this.cells.push(new Cell(this, savedOrder[i], showImage, showNumbers));
       this.cells[i].setPosition(i);
     }
-    while (this.shufflesCount < this.dimmension * 2500) {
+    // this.shuffled = true;
+    // this.swapableCheck();
+    // this.setup();
+  }
+
+  newGameSetup(showImage, showNumbers) {
+    for (let i = 0; i < this.dimension * this.dimension; i += 1) {
+      this.cells.push(new Cell(this, i, showImage, showNumbers));
+      this.cells[i].setPosition(i);
+    }
+    while (this.shufflesCount < this.dimension * 2500) {
       this.shuffle();
     }
     this.shuffled = true;
+    this.setup();
+  }
+
+  setup() {
     this.dragStarter();
     // add event listener for drag on empty cell
     let emptyCellIndex = this.findEmpty();
@@ -113,7 +137,7 @@ export default class Puzzle {
   shuffle() {
     this.shufflesCount += 1; // counter of shuffles
     const emptyCellIndex = this.findEmpty();
-    const currentCellIndex = Math.floor(Math.random() * this.dimmension * this.dimmension);
+    const currentCellIndex = Math.floor(Math.random() * this.dimension * this.dimension);
     if (this.canSwapCheck(currentCellIndex, emptyCellIndex)) {
       this.swapCells(currentCellIndex, emptyCellIndex);
       if (this.isAssembled()) { // if shuffed to assembled — reshuffle
@@ -138,8 +162,8 @@ export default class Puzzle {
 
   getXY(index) {
     return {
-      x: index % this.dimmension,
-      y: Math.floor(index / this.dimmension),
+      x: index % this.dimension,
+      y: Math.floor(index / this.dimension),
     };
   }
 
@@ -192,11 +216,11 @@ export default class Puzzle {
     const totalTimeResult = document.querySelector('.totalTimeResult');
     totalTimeResult.textContent = `Time: ${totalTime}`;
     const boardSize = document.querySelector('.boardSize');
-    boardSize.textContent = `Size: ${this.dimmension} x ${this.dimmension}`;
+    boardSize.textContent = `Size: ${this.dimension} x ${this.dimension}`;
     lastWinResult.splice(0, lastWinResult.length); // if array
     lastWinResult.push(this.moves);
     lastWinResult.push(totalTime);
-    lastWinResult.push(this.dimmension);
+    lastWinResult.push(this.dimension);
     localStorage.setItem('lastWinResult', lastWinResult);
   }
 }

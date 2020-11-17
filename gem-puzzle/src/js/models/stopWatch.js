@@ -8,9 +8,9 @@ export default class StopWatch {
     StopWatch.totalTime = 0;
   }
 
-  startTimer(startTime = new Date().getTime()) {
+  startTimer(loadedTime = 0, startTime = new Date().getTime()) {
     if (!this.running) {
-      StopWatch.startTime = startTime;
+      StopWatch.startTime = startTime - (loadedTime * 1000);
       this.tInterval = setInterval(this.getShowTime, 1000);
       this.paused = 0;
       this.running = 1;

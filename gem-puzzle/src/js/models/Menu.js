@@ -9,7 +9,7 @@ export default class Menu {
     this.sound = true;
     this.resume = document.querySelector('#resume');
     this.settingsOn = false;
-    this.showImages = true;
+    this.showImage = true;
     this.showNumbers = true;
     this.fieldSize = 4;
     this.hasSavedGame = false;
@@ -19,7 +19,6 @@ export default class Menu {
   initMenu() {
     // main menu
     const body = document.querySelector('body');
-    const contentWrapper = document.querySelector('.content-wrapper');
     const menu = document.createElement('div');
     const menuBg = document.createElement('div');
     const menuWrapper = document.createElement('div');
@@ -62,7 +61,7 @@ export default class Menu {
 
     // save/load game menu item swap
     const loadBtn = document.querySelector('#loadGame');
-    if (!this.hasSavedGame) {
+    if (!localStorage.getItem('savedGame')) {
       loadBtn.classList.add('hidden');
     }
     document.querySelector('#autocomplete').classList.add('hidden');
@@ -191,18 +190,90 @@ export default class Menu {
     scoreWrapper.append(scoreCloseBtn);
   }
 
-  settingsOnOff(images = this.showImages, numbers = this.showNumbers, size = this.fieldSize) {
+  settingsOnOff(images = this.showImage, numbers = this.showNumbers, size = this.fieldSize) {
     const settingsWrapper = document.querySelector('.settings-wrapper');
     if (this.settingsOn) {
       this.settingsOn = false;
       settingsWrapper.classList.add('hidden');
-      this.showImages = images;
+      this.showImage = images;
       this.showNumbers = numbers;
       this.fieldSize = size;
     } else {
       this.settingsOn = true;
       settingsWrapper.classList.remove('hidden');
     }
+  }
+
+  saveGame(puzzle) {
+    const savedGame = {
+      img: './assets/images/1.jpg',
+      showImage: true,
+      showNumbers: true,
+      moves: 1,
+      order: [],
+      size: 4,
+      time: {
+        hours: '00',
+        mins: '00',
+        secs: '00',
+      },
+      innerHTML: '',
+    };
+    let puzzleCellsDiv = '';
+    if (document.querySelector('.puzzle-cells')) {
+      puzzleCellsDiv = document.querySelector('.puzzle-cells').innerHTML;
+    }
+    savedGame.innerHTML = puzzleCellsDiv;
+    if (puzzle) {
+      savedGame.showNumbers = this.showNumbers;
+      savedGame.showImage = this.showImage;
+
+      let tempImageSrc = '';
+      if (savedGame.showImage) {
+        if (puzzle.cells[0].el.style.backgroundImage !== '') {
+          tempImageSrc = puzzle.cells[0].el.style.backgroundImage;
+        } else {
+          tempImageSrc = puzzle.cells[1].el.style.backgroundImage;
+        }
+        tempImageSrc = tempImageSrc.slice(5);
+        tempImageSrc = tempImageSrc.slice(0, -2);
+        savedGame.img = tempImageSrc;
+      }
+
+      const cellsOrder = [];
+      puzzle.cells.forEach((elem) => {
+        cellsOrder.push(elem.el.textContent);
+      });
+
+      savedGame.moves = puzzle.moves;
+      savedGame.order = cellsOrder;
+      savedGame.size = puzzle.dimension;
+      savedGame.time = document.querySelector('.timer').children[1].textContent;
+      localStorage.setItem('savedGame', JSON.stringify(savedGame));
+      this.hasSavedGame = true;
+
+      const loadBtn = document.querySelector('#loadGame');
+      loadBtn.classList.remove('hidden');
+    }
+  }
+
+  loadGame() {
+    const savedGgame = JSON.parse(localStorage.getItem('savedGame'));
+    // console.log(savedGgame);
+    const { img } = savedGgame;
+    const { showImage } = savedGgame;
+    const { showNumbers } = savedGgame;
+    const { moves } = savedGgame;
+    const { order } = savedGgame;
+    const { size } = savedGgame;
+    const { time } = savedGgame;
+    const { innerHTML } = savedGgame;
+
+    return {
+      img, showImage, showNumbers, moves, order, size, time, innerHTML,
+    };
+    // startNewGame()
+    // savedGame = JSON.parse(savedGame);
   }
 }
 
@@ -214,11 +285,11 @@ function getRandomImage() {
 
 export const stopwatch = new StopWatch();
 let puzzle;
-function startNewGame(showImages = true, showNumbers = true, dimemension = 4, sound = true) {
+function startNewGame(showImage = true, showNumbers = true, dimension = 4, sound = true) {
   let cellsSize;
-  if (window.innerWidth < 480) {
+  if (window.innerWidth < 480 || window.innerHeight < 760) {
     cellsSize = 310;
-  } else if (window.innerWidth <= 1920) {
+  } else if (window.innerWidth <= 1920 || window.innerHeight <= 970) {
     cellsSize = 384;
   } else if (window.innerWidth > 1920) {
     cellsSize = 480;
@@ -230,14 +301,15 @@ function startNewGame(showImages = true, showNumbers = true, dimemension = 4, so
   stopwatch.startTimer();
   document.querySelector('.puzzle-wrapper').innerHTML = '';
   puzzle = new Puzzle(
+    true, // new game is true
     document.querySelector('.puzzle-wrapper'),
-    dimemension,
+    dimension,
     getRandomImage(), // pass random image url
     cellsSize,
     sound,
   );
   // puzzle settings
-  puzzle.showImages = showImages;
+  puzzle.showImage = showImage;
   puzzle.showNumbers = showNumbers;
 }
 
@@ -253,7 +325,7 @@ export function showHideResumeBtn() {
 
 const mnu = document.querySelector('.menu');
 document.querySelector('#newGame').addEventListener('click', () => {
-  startNewGame(menu.showImages, menu.showNumbers, menu.fieldSize, menu.sound);
+  startNewGame(menu.showImage, menu.showNumbers, menu.fieldSize, menu.sound);
   puzzle.canResume = true;
   mnu.classList.add('hidden');
   const movesCounter = document.querySelector('.movesCounter');
@@ -362,10 +434,61 @@ document.querySelector('#autocomplete').addEventListener('click', () => {
 const saveBtn = document.querySelector('#saveGame');
 
 saveBtn.addEventListener('click', () => {
-  // console.log('save');
-  // console.log(puzzle.cells); // puzzle cells positions object
-  // console.log(stopwatch);
-  // console.log(stopwatch.getShowTime());
+  menu.saveGame(puzzle);
 });
 
-// const loadBtn = document.querySelector('#loadGame');
+function loadOldGame(img, showImage = true, showNumbers = true, moves, dimension = 4, sound = true,
+  order, time) {
+  let cellsSize;
+  if (window.innerWidth < 480) {
+    cellsSize = 310;
+  } else if (window.innerWidth <= 1920) {
+    cellsSize = 384;
+  } else if (window.innerWidth > 1920) {
+    cellsSize = 480;
+  }
+  if (puzzle) {
+    stopwatch.resetTimer();
+    puzzle.reset();
+  }
+  // console.log(time);
+
+  const tempTimer = time.split(':');
+  const hours = tempTimer[0];
+  const minutes = tempTimer[1];
+  const seconds = tempTimer[2];
+  // convert total time to seconds
+  const totalSecs = seconds * 1 + minutes * 60 + hours * 3600;
+
+  stopwatch.startTimer(totalSecs);
+  document.querySelector('.puzzle-wrapper').innerHTML = '';
+  puzzle = new Puzzle(
+    false, // new game - false becouse it is loaded game
+    document.querySelector('.puzzle-wrapper'),
+    dimension,
+    img, // pass saved image url
+    cellsSize,
+    sound,
+    moves,
+  );
+  // puzzle settings
+  puzzle.showImage = showImage;
+  puzzle.showNumbers = showNumbers;
+  puzzle.moves = moves; // saved moves
+  puzzle.savedOrder = order;
+}
+
+const loadBtn = document.querySelector('#loadGame');
+loadBtn.addEventListener('click', () => {
+  const {
+    img, showImage, showNumbers, moves, order, size, time, innerHTML,
+  } = menu.loadGame();
+  loadOldGame(img, showImage, showNumbers, moves, size, menu.sound, order, time, innerHTML);
+  document.querySelector('.puzzle-wrapper').innerHTML = innerHTML;
+  puzzle.canResume = true;
+  mnu.classList.add('hidden');
+  const movesCounter = document.querySelector('.movesCounter');
+  movesCounter.children[1].textContent = moves; // reset moves counter on screen
+  const timer = document.querySelector('.timer');
+  timer.children[1].innerHTML = time; // reset time counter on screen
+});
