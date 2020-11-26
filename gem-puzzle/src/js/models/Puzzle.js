@@ -1,5 +1,4 @@
 import Cell from './Cell';
-// import Drag from './Drag';
 
 const lastWinResult = [];
 export default class Puzzle {
@@ -20,8 +19,6 @@ export default class Puzzle {
 
     this.shuffled = false;
     this.shufflesCount = 0;
-
-    // this.y = 0;
 
     this.lastShuffled = 0;
 
@@ -57,14 +54,10 @@ export default class Puzzle {
   }
 
   loadedGameSetup(showImage, showNumbers, savedOrder) {
-    // console.log(savedOrder);
     for (let i = 0; i < this.dimension * this.dimension; i += 1) {
       this.cells.push(new Cell(this, savedOrder[i], showImage, showNumbers));
       this.cells[i].setPosition(i);
     }
-    // this.shuffled = true;
-    // this.swapableCheck();
-    // this.setup();
   }
 
   newGameSetup(showImage, showNumbers) {
@@ -84,6 +77,7 @@ export default class Puzzle {
     // add event listener for drag on empty cell
     let emptyCellIndex = this.findEmpty();
     const emptyCell = document.querySelector('.cell__empty');
+    emptyCell.removeEventListener();
     emptyCell.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
