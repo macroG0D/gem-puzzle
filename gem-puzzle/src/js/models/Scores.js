@@ -9,10 +9,6 @@ export default class Scores {
     const oneResultItems = [moves, boardSize, timer, this.getTotalSecs(timer)];
     const oneResult = [];
     oneResult.push(...oneResultItems);
-    // oneResult.push(moves);
-    // oneResult.push(boardSize);
-    // oneResult.push(timer);
-    // oneResult.push(this.getTotalSecs(timer)); // total seconds
     this.topResults(oneResult);
   }
 

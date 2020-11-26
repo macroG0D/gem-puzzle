@@ -72,25 +72,26 @@ export default class Puzzle {
     this.setup();
   }
 
+  emptyCellDragHandler() {
+    this.emptyCellIndex = this.findEmpty();
+    this.moves += 1;
+    const movesCounter = document.querySelector('.movesCounter');
+    movesCounter.children[1].textContent = this.moves;
+    if (this.sound) {
+      this.moveSound.play();
+    }
+    this.swapCells(this.draggedCellIndex, this.emptyCellIndex);
+  }
+
   setup() {
     this.dragStarter();
     // add event listener for drag on empty cell
-    let emptyCellIndex = this.findEmpty();
-    const emptyCell = document.querySelector('.cell__empty');
-    emptyCell.removeEventListener();
-    emptyCell.addEventListener('dragover', (e) => {
+    this.emptyCellIndex = this.findEmpty();
+    this.emptyCell = document.querySelector('.cell__empty');
+    this.emptyCell.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
-    emptyCell.addEventListener('drop', () => {
-      emptyCellIndex = this.findEmpty();
-      this.moves += 1;
-      const movesCounter = document.querySelector('.movesCounter');
-      movesCounter.children[1].textContent = this.moves;
-      if (this.sound) {
-        this.moveSound.play();
-      }
-      this.swapCells(this.draggedCellIndex, emptyCellIndex);
-    });
+    this.emptyCell.addEventListener('drop', this.emptyCellDragHandler.bind(this));
   }
 
   swapableCheck() {
@@ -109,22 +110,26 @@ export default class Puzzle {
     }
   }
 
+  dragStartHandler(dragablecell) {
+    dragablecell.classList.add('blured');
+    // setTimeout(() => (dragablecell.classList.add('hidden')), 0);
+    this.cells.forEach((cell, index) => {
+      if (cell.el === dragablecell) {
+        this.draggedCellIndex = index;
+      }
+    });
+  }
+
+  dragEndHandler(dragablecell) {
+    dragablecell.classList.remove('hidden');
+    dragablecell.classList.remove('blured');
+  }
+
   dragStarter() {
-    const draggableCells = document.querySelectorAll('.draggable');
-    draggableCells.forEach((dragablecell) => {
-      dragablecell.addEventListener('dragstart', () => {
-        dragablecell.classList.add('blured');
-        setTimeout(() => (dragablecell.classList.add('hidden')), 0);
-        this.cells.forEach((cell, index) => {
-          if (cell.el === dragablecell) {
-            this.draggedCellIndex = index;
-          }
-        });
-      });
-      dragablecell.addEventListener('dragend', () => {
-        dragablecell.classList.remove('hidden');
-        dragablecell.classList.remove('blured');
-      });
+    this.draggableCells = document.querySelectorAll('.draggable');
+    this.draggableCells.forEach((dragablecell) => {
+      dragablecell.addEventListener('dragstart', this.dragStartHandler.bind(this, dragablecell));
+      dragablecell.addEventListener('dragend', this.dragEndHandler(dragablecell));
     });
   }
 
@@ -194,6 +199,19 @@ export default class Puzzle {
 
   reset() {
     this.moves = 0;
+    if (this.emptyCell) {
+      this.emptyCell.removeEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      this.emptyCell.removeEventListener('drop', this.emptyCellDragHandler.bind(this));
+    }
+    if (this.draggableCells) {
+      this.draggableCells.forEach((dragablecell) => {
+        dragablecell.removeEventListener('dragstart', this.dragStartHandler.bind(this, dragablecell));
+        dragablecell.removeEventListener('dragend', this.dragEndHandler(dragablecell));
+      });
+    }
   }
 
   win() {
