@@ -6,11 +6,13 @@ export default class Scores {
     const timer = lastWinScore[1]; // total time
     const boardSize = lastWinScore[2]; // finished game board size
 
+    const oneResultItems = [moves, boardSize, timer, this.getTotalSecs(timer)];
     const oneResult = [];
-    oneResult.push(moves);
-    oneResult.push(boardSize);
-    oneResult.push(timer);
-    oneResult.push(this.getTotalSecs(timer)); // total seconds
+    oneResult.push(...oneResultItems);
+    // oneResult.push(moves);
+    // oneResult.push(boardSize);
+    // oneResult.push(timer);
+    // oneResult.push(this.getTotalSecs(timer)); // total seconds
     this.topResults(oneResult);
   }
 

@@ -41,7 +41,8 @@ export default class Menu {
       ['Settings', 'openSettings'],
       ['Autocomplete', 'autocomplete'],
     ];
-    for (let i = 0; i < 7; i += 1) {
+    const listItemsLength = menuItemsProps.length;
+    for (let i = 0; i < listItemsLength; i += 1) {
       menuItems.push(document.createElement('li'));
     }
     menu.appendChild(menuBg);
